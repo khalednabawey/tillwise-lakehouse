@@ -36,7 +36,8 @@ display(spark.table(T.fq("gold", "forecast_weekly")).orderBy("stock_code", "coun
 
 # COMMAND ----------
 
-# MAGIC %md Register the model in Unity Catalog (after the table is written, so a registry problem can't block the forecast).
+# MAGIC %md Register the model in Unity Catalog. This runs after the table is written,
+# MAGIC so a registry problem cannot block the forecast.
 
 # COMMAND ----------
 
