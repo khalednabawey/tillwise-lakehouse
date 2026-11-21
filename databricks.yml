@@ -1,0 +1,22 @@
+# Databricks Asset Bundle: deploys the pipeline and the daily job from this repo.
+#   databricks bundle validate
+#   databricks bundle deploy -t dev
+#   databricks bundle run tillwise_daily -t dev
+# If bundles can't deploy on your Free Edition workspace, create the pipeline and job
+# in the UI with the same settings (see resources/*.yml) from a Git folder of this repo.
+
+bundle:
+  name: tillwise
+
+variables:
+  catalog:
+    description: Unity Catalog catalog for all Tillwise schemas
+    default: tillwise
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true

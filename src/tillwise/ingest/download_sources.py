@@ -63,7 +63,7 @@ def download_weather(out_dir: Path) -> Path:
 def write_holidays(out_dir: Path) -> Path:
     import holidays
 
-    uk = holidays.country_holidays("GB", subdiv="ENG", years=[2009, 2010, 2011])
+    uk = holidays.country_holidays("GB", subdiv="ENG", years=[2009, 2010, 2011, 2012])
     df = pd.DataFrame(sorted(uk.items()), columns=["date", "holiday_name"])
     path = out_dir / "uk_holidays.csv"
     df.to_csv(path, index=False)

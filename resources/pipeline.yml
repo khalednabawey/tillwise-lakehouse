@@ -1,0 +1,16 @@
+resources:
+  pipelines:
+    tillwise_medallion:
+      name: tillwise-medallion
+      catalog: ${var.catalog}
+      schema: silver          # default schema; tables use fully qualified names
+      serverless: true        # Free Edition is serverless-only
+      channel: CURRENT
+      photon: true
+      libraries:
+        - file:
+            path: ../databricks/pipelines/tillwise_pipeline.py
+      configuration:
+        tillwise.catalog: ${var.catalog}
+        tillwise.src_path: ${workspace.file_path}/src
+        tillwise.landing_path: /Volumes/${var.catalog}/raw/landing

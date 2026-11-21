@@ -32,7 +32,7 @@ except Exception:  # noqa: BLE001
     holidays = []
 
 bounds = clean.agg(F.min("invoice_ts").alias("lo"), F.max("invoice_ts").alias("hi")).first()
-dim_date = gold.build_dim_date(spark, date(bounds["lo"].year, 1, 1), date(bounds["hi"].year, 12, 31),  # noqa: F821
+dim_date = gold.build_dim_date(spark, date(bounds["lo"].year, 1, 1), date(bounds["hi"].year + 1, 12, 31),  # noqa: F821
                                holidays)
 
 dims = {

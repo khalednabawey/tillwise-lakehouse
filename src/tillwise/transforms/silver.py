@@ -51,7 +51,7 @@ def type_transactions(bronze: DataFrame) -> DataFrame:
     )
 
 
-def _first_matching_rule() -> F.Column:
+def first_matching_rule() -> F.Column:
     """CASE WHEN rule_1 THEN 'rule_1' WHEN rule_2 ... END, in QUARANTINE_RULES order."""
     expr = None
     for name, condition in QUARANTINE_RULES.items():
@@ -73,7 +73,7 @@ def split_transactions(typed: DataFrame) -> SilverResult:
     deduped = typed.dropDuplicates(BUSINESS_COLUMNS)
     duplicates = typed.exceptAll(deduped)
 
-    flagged = deduped.withColumn("dq_reason", _first_matching_rule()).withColumn(
+    flagged = deduped.withColumn("dq_reason", first_matching_rule()).withColumn(
         "is_non_product", F.coalesce(F.col("stock_code").rlike(NON_PRODUCT_CODE_PATTERN), F.lit(False))
     )
 

@@ -34,7 +34,7 @@ def run_silver_and_gold(bronze: DataFrame, holidays: list[tuple[date, str]] | No
     if bounds is None or bounds["lo"] is None:
         raise ValueError("No clean rows: check the bronze input")
     start, end = bounds["lo"].date(), bounds["hi"].date()
-    dim_date = gold.build_dim_date(bronze.sparkSession, date(start.year, 1, 1), date(end.year, 12, 31),
+    dim_date = gold.build_dim_date(bronze.sparkSession, date(start.year, 1, 1), date(end.year + 1, 12, 31),
                                    holidays or [])
 
     return PipelineOutputs(

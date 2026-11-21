@@ -1,6 +1,9 @@
 name: ci
 
-# Every push and pull request: lint, then the PySpark unit tests on a local Spark session.
+# Every push and pull request: lint, then all unit tests (PySpark on a local session, the agent on a
+# tiny DuckDB gold layer with a fake model). No API keys or Databricks workspace needed.
+# The 30-question agent eval needs the full gold export and model keys, so it runs locally:
+#   uv run python scripts/export_gold_local.py && uv run python evals/run_eval.py
 
 on:
   push:
@@ -15,7 +18,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -29,10 +32,10 @@ jobs:
           enable-cache: true
 
       - name: Install
-        run: uv sync --all-groups
+        run: uv sync --all-groups --extra agent
 
       - name: Lint
         run: uv run ruff check .
 
-      - name: Unit tests (local Spark)
+      - name: Unit tests
         run: uv run pytest

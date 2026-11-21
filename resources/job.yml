@@ -1,0 +1,27 @@
+resources:
+  jobs:
+    tillwise_daily:
+      name: tillwise-daily
+      # Three sequential tasks: well inside Free Edition's limit of 5 concurrent tasks.
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?"   # 06:00 daily
+        timezone_id: Africa/Cairo
+        pause_status: PAUSED                    # unpause when you want it to run on schedule
+      tasks:
+        - task_key: refresh_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.tillwise_medallion.id}
+
+        - task_key: backtest_forecast
+          depends_on: [{ task_key: refresh_pipeline }]
+          notebook_task:
+            notebook_path: ../databricks/04_train_forecast.py
+            base_parameters:
+              catalog: ${var.catalog}
+
+        - task_key: forecast_next_weeks
+          depends_on: [{ task_key: backtest_forecast }]
+          notebook_task:
+            notebook_path: ../databricks/05_forecast_inference.py
+            base_parameters:
+              catalog: ${var.catalog}

@@ -12,6 +12,7 @@ __pycache__/
 data/raw/*
 !data/raw/.gitkeep
 data/build/
+data/gold/
 
 # Spark local artefacts
 spark-warehouse/
@@ -23,3 +24,4 @@ derby.log
 .idea/
 .DS_Store
 Thumbs.db
+mlruns/
