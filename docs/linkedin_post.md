@@ -1,7 +1,6 @@
 # LinkedIn post draft
 
-Post this only after the Databricks run and the demo video, so every claim is true. Replace the
-bracketed parts.
+The Databricks run is done (21 Nov 2026). Post after recording the demo video, and replace the bracketed parts.
 
 I built a retail sales lakehouse on Databricks to learn the stack properly: PySpark, Delta, Unity Catalog and
 Lakeflow.

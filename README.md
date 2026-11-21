@@ -8,8 +8,9 @@ Unity Catalog) that is backtested against three baselines. A small data agent an
 from the gold layer through fixed, read-only tools. It scored 30/30 on an evaluation set whose answers are
 computed straight from the data.
 
-> Status: **all 3 weeks built and tested locally and in CI.** The Databricks pipeline, job and notebooks are
-> written but not yet run in a workspace. See [Roadmap](#roadmap).
+> Status: **all 3 weeks built, tested in CI, and running on Databricks Free Edition** (21 Nov 2026): the
+> Lakeflow pipeline, the daily job (pipeline → backtest → forecast) and the Unity Catalog model registration.
+> See [Running on Databricks](#running-on-databricks).
 
 ## Architecture
 
@@ -193,6 +194,43 @@ are in [`evals/reports/latest.md`](evals/reports/latest.md). Groq's free tier hi
 run, so 20 of the 30 answers came from the OpenRouter fallback. That is a useful test of the fallback, and the
 score held.
 
+## Running on Databricks
+
+Run on Databricks Free Edition (serverless) on 21 November 2026, using this repo as a Git folder:
+
+1. `00_setup_unity_catalog` created the `tillwise` catalog, the five schemas and the landing volume (Free
+   Edition allowed `CREATE CATALOG`).
+2. `00b_load_sources` downloaded the UCI data straight into the volume.
+3. `07_deploy_pipeline_and_job` created the Lakeflow pipeline and the `tillwise-daily` job with the Databricks
+   SDK, then started the job.
+
+| Check (SQL on the Databricks tables) | Databricks | Local run |
+|---|---:|---:|
+| Bronze rows | 1,067,371 | 1,067,371 |
+| `fact_sales` rows | 1,021,332 | 1,021,332 |
+| Duplicates removed | 34,335 | 34,335 |
+| Net revenue 2010 | £9,136,724.93 | £9,136,724.93 |
+| Champions customers | 1,335 | 1,335 |
+| Forecast rows (227 series × 8 weeks) | 1,816 | 1,816 |
+| Backtest WAPE, gradient-boosted model | 0.646 | 0.669 |
+| Backtest WAPE, 4-week average | 0.677 | 0.677 |
+
+The data numbers match exactly. The model's WAPE differs slightly because gradient boosting samples rows
+randomly, and Spark splits the data differently on the two machines; the deterministic baseline is identical.
+The job took about 16 minutes: pipeline 8.5 min (including waiting for serverless compute), backtest 2.5 min,
+forecast 2 min.
+
+**What the first runs taught (each is fixed in the code):**
+- **No actions in pipeline functions.** `count()`, `first()` and `collect()` inside a Lakeflow table function
+  fail, because upstream tables don't exist yet when the graph is planned. The calendar bounds, RFM as-of date,
+  full-week sequence and data-quality metrics are now pure transformations.
+- **`TIMESTAMP_NTZ` needs a Delta table feature.** Every pipeline table sets
+  `delta.feature.timestampNtz = supported`.
+- **No caching on serverless.** `try_cache()` skips it there.
+- **Spark ML models on serverless need a UC volume.** `mlflow.spark.log_model` saves through `dfs_tmpdir`, here
+  `/Volumes/tillwise/ml/mlflow_tmp`. The forecast table is written before registration, so a registry problem
+  can't block the forecast.
+
 ## Run it
 
 **Local (tests and a full run on your laptop)** — needs Java 17+ and [uv](https://docs.astral.sh/uv/):
@@ -234,8 +272,8 @@ uv run python evals/run_eval.py                      # 30-question eval → eval
 - [x] **Week 2** — Lakeflow pipeline with an expectation per rule, Databricks Job and Asset Bundle, RFM
       segments, weekly demand features, direct multi-horizon GBT with backtest vs three baselines, MLflow
       tracking, UC model registration, p10/p90 intervals, dashboard queries
-- [ ] **Run in Databricks Free Edition** — deploy the bundle, run the job, take screenshots of the pipeline
-      graph, expectation metrics, MLflow runs and dashboard, and commit the dashboard export
+- [x] **Run in Databricks Free Edition** — pipeline, job, forecast and UC model registration all succeeded
+- [ ] Take screenshots (pipeline graph, expectation metrics, MLflow run, job run) and build the AI/BI dashboard
 - [x] **Week 3** — FastAPI + LangGraph agent with nine read-only tools, number grounding, Groq → OpenRouter
       fallback, DuckDB and Databricks SQL backends, 30-question eval (30/30), demo script
       ([docs/demo_script.md](docs/demo_script.md))
