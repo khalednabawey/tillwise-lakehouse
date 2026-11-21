@@ -14,6 +14,10 @@ computed straight from the data.
 
 ## Architecture
 
+![How Tillwise works](docs/architecture.png)
+
+<sub>Source: [docs/architecture.svg](docs/architecture.svg). Numbers are from the Databricks run on 21 Nov 2026.</sub>
+
 ```text
 UCI Online Retail II CSVs ──► UC Volume /raw/landing/retail/
                                    │  Auto Loader (incremental, all strings + lineage)

@@ -1,0 +1,278 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1060" viewBox="0 0 1600 1060" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrowW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#ffffff"/>
+    </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .t  { font-size: 15px; font-weight: 700; fill: #0f172a; }
+      .s  { font-size: 12.5px; fill: #334155; }
+      .xs { font-size: 11.5px; fill: #475569; }
+      .h  { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; }
+      .num{ font-size: 12.5px; font-weight: 700; fill: #0f172a; }
+      .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.2; filter: url(#shadow); }
+      .flow { stroke: #475569; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #64748b; stroke-width: 1.6; fill: none; stroke-dasharray: 6 5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <!-- background -->
+  <rect width="1600" height="1060" fill="#f8fafc"/>
+
+  <!-- title -->
+  <text x="30" y="46" font-size="28" font-weight="800" fill="#0f172a">Tillwise · how it works</text>
+  <text x="32" y="72" font-size="14.5" fill="#475569">Retail sales lakehouse on Databricks Free Edition: from raw invoices to a forecast and a data agent. Numbers are from the Databricks run on 21 Nov 2026.</text>
+
+  <!-- ============ ORCHESTRATION BAR ============ -->
+  <rect x="30" y="92" width="1540" height="58" rx="10" fill="#0f172a"/>
+  <text x="50" y="117" font-size="12.5" font-weight="700" fill="#94a3b8" letter-spacing="1.5">ORCHESTRATION</text>
+  <text x="50" y="138" font-size="14" font-weight="700" fill="#ffffff">Databricks Job  tillwise-daily</text>
+  <text x="262" y="138" font-size="12" fill="#cbd5e1">created by notebook 07 (Databricks SDK) · same settings as the Asset Bundle in resources/</text>
+  <rect x="820" y="104" width="190" height="34" rx="17" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="915" y="126" font-size="13" fill="#e0f2fe" text-anchor="middle">1 · refresh_pipeline</text>
+  <rect x="1050" y="104" width="200" height="34" rx="17" fill="#1e293b" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="1150" y="126" font-size="13" fill="#ede9fe" text-anchor="middle">2 · backtest_forecast</text>
+  <rect x="1290" y="104" width="250" height="34" rx="17" fill="#1e293b" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="1415" y="126" font-size="13" fill="#ede9fe" text-anchor="middle">3 · forecast_next_weeks</text>
+  <line x1="1012" y1="121" x2="1046" y2="121" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowW)"/>
+  <line x1="1252" y1="121" x2="1286" y2="121" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowW)"/>
+
+  <!-- ============ SOURCES ============ -->
+  <text x="30" y="188" class="h" fill="#0369a1">SOURCES</text>
+  <rect x="30" y="200" width="200" height="92" rx="10" class="card"/>
+  <rect x="30" y="200" width="6" height="92" rx="3" fill="#0284c7"/>
+  <text x="46" y="224" class="t">UCI Online Retail II</text>
+  <text x="46" y="244" class="s">UK gift retailer, Dec 2009 –</text>
+  <text x="46" y="261" class="s">Dec 2011 · CC BY 4.0</text>
+  <text x="46" y="280" class="num">1,067,371 invoice lines</text>
+
+  <rect x="30" y="306" width="200" height="62" rx="10" class="card"/>
+  <rect x="30" y="306" width="6" height="62" rx="3" fill="#0284c7"/>
+  <text x="46" y="331" class="t">UK bank holidays</text>
+  <text x="46" y="351" class="s">holidays package (2009–2012)</text>
+
+  <rect x="30" y="382" width="200" height="62" rx="10" class="card"/>
+  <rect x="30" y="382" width="6" height="62" rx="3" fill="#0284c7"/>
+  <text x="46" y="407" class="t">Open-Meteo</text>
+  <text x="46" y="427" class="s">London daily weather (optional)</text>
+
+  <!-- landing volume -->
+  <rect x="258" y="270" width="168" height="120" rx="10" class="card"/>
+  <rect x="258" y="270" width="168" height="30" rx="10" fill="#e0f2fe"/>
+  <rect x="258" y="290" width="168" height="10" fill="#e0f2fe"/>
+  <text x="342" y="291" font-size="13" font-weight="700" fill="#0369a1" text-anchor="middle">UNITY CATALOG VOLUME</text>
+  <text x="342" y="322" class="t" text-anchor="middle">landing</text>
+  <text x="342" y="342" class="xs" text-anchor="middle">/Volumes/tillwise/raw/</text>
+  <text x="342" y="358" class="xs" text-anchor="middle">landing/retail · reference</text>
+  <text x="342" y="378" class="xs" text-anchor="middle" font-style="italic">loaded by 00b_load_sources</text>
+
+  <path class="flow" d="M230,246 C245,246 245,300 256,305"/>
+  <path class="flow" d="M230,337 L256,337"/>
+  <path class="flow" d="M230,413 C245,413 245,370 256,365"/>
+
+  <!-- ============ LAKEFLOW PIPELINE ============ -->
+  <rect x="448" y="172" width="670" height="596" rx="14" fill="#eef2ff" stroke="#38bdf8" stroke-width="2" stroke-dasharray="8 5"/>
+  <text x="466" y="196" class="h" fill="#0369a1">LAKEFLOW DECLARATIVE PIPELINE · tillwise-medallion</text>
+  <text x="466" y="215" class="xs">serverless · 13 tables · same tested functions as the local runner · no actions inside table functions</text>
+
+  <!-- bronze -->
+  <text x="470" y="248" class="h" fill="#b45309">BRONZE</text>
+  <rect x="466" y="258" width="180" height="168" rx="10" class="card"/>
+  <rect x="466" y="258" width="180" height="8" rx="4" fill="#c2762e"/>
+  <text x="480" y="290" class="t">transactions_raw</text>
+  <text x="480" y="312" class="s">Auto Loader (cloudFiles)</text>
+  <text x="480" y="330" class="s">incremental, checkpointed</text>
+  <text x="480" y="348" class="s">all columns as strings</text>
+  <text x="480" y="366" class="s">+ source file, ingest time</text>
+  <text x="480" y="398" class="num">1,067,371 rows</text>
+
+  <!-- silver -->
+  <text x="676" y="248" class="h" fill="#475569">SILVER</text>
+  <rect x="672" y="258" width="210" height="64" rx="10" class="card"/>
+  <rect x="672" y="258" width="210" height="8" rx="4" fill="#94a3b8"/>
+  <text x="686" y="288" class="t">transactions</text>
+  <text x="686" y="308" class="s">clean sales + returns · <tspan class="num">1,021,332</tspan></text>
+
+  <rect x="672" y="332" width="210" height="64" rx="10" class="card"/>
+  <rect x="672" y="332" width="210" height="8" rx="4" fill="#ef4444"/>
+  <text x="686" y="362" class="t">transactions_quarantine</text>
+  <text x="686" y="382" class="s">one dq_reason per row · <tspan class="num">6,039</tspan></text>
+
+  <rect x="672" y="406" width="210" height="64" rx="10" class="card"/>
+  <rect x="672" y="406" width="210" height="8" rx="4" fill="#94a3b8"/>
+  <text x="686" y="436" class="t">non_product_lines</text>
+  <text x="686" y="456" class="s">postage, fees · <tspan class="num">5,665</tspan></text>
+
+  <rect x="672" y="480" width="210" height="64" rx="10" class="card"/>
+  <rect x="672" y="480" width="210" height="8" rx="4" fill="#94a3b8"/>
+  <text x="686" y="510" class="t">products_scd2</text>
+  <text x="686" y="530" class="s">SCD Type 2 · <tspan class="num">6,695</tspan> versions</text>
+
+  <rect x="672" y="554" width="210" height="64" rx="10" class="card"/>
+  <rect x="672" y="554" width="210" height="8" rx="4" fill="#94a3b8"/>
+  <text x="686" y="584" class="t">dq_metrics</text>
+  <text x="686" y="604" class="s">row counts per outcome</text>
+
+  <!-- expectations badge -->
+  <rect x="466" y="446" width="180" height="172" rx="10" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/>
+  <text x="480" y="472" font-size="13" font-weight="700" fill="#b91c1c">Data-quality rules</text>
+  <text x="480" y="494" class="xs">6 named expectations</text>
+  <text x="480" y="512" class="xs">(pass/fail count per rule)</text>
+  <text x="480" y="536" class="xs">de-duplication:</text>
+  <text x="480" y="553" class="num">34,335 removed</text>
+  <text x="480" y="576" class="xs">incl. 22,523 rows of a week</text>
+  <text x="480" y="593" class="xs">in both source sheets</text>
+  <text x="480" y="610" class="xs">nothing dropped silently</text>
+
+  <!-- gold -->
+  <text x="912" y="248" class="h" fill="#b45309">GOLD</text>
+  <rect x="908" y="258" width="196" height="64" rx="10" class="card"/>
+  <rect x="908" y="258" width="196" height="8" rx="4" fill="#f59e0b"/>
+  <text x="922" y="288" class="t">fact_sales</text>
+  <text x="922" y="308" class="s">product version at sale time</text>
+
+  <rect x="908" y="332" width="196" height="64" rx="10" class="card"/>
+  <rect x="908" y="332" width="196" height="8" rx="4" fill="#f59e0b"/>
+  <text x="922" y="362" class="t">dimensions</text>
+  <text x="922" y="382" class="xs">product · customer · country · date</text>
+
+  <rect x="908" y="406" width="196" height="64" rx="10" class="card"/>
+  <rect x="908" y="406" width="196" height="8" rx="4" fill="#f59e0b"/>
+  <text x="922" y="436" class="t">customer_rfm</text>
+  <text x="922" y="456" class="s">6 segments · Champions <tspan class="num">1,335</tspan></text>
+
+  <rect x="908" y="480" width="196" height="64" rx="10" class="card"/>
+  <rect x="908" y="480" width="196" height="8" rx="4" fill="#f59e0b"/>
+  <text x="922" y="510" class="t">weekly_product_demand</text>
+  <text x="922" y="530" class="s">227 series × 104 full weeks</text>
+
+  <rect x="908" y="554" width="196" height="64" rx="10" class="card"/>
+  <rect x="908" y="554" width="196" height="8" rx="4" fill="#f59e0b"/>
+  <text x="922" y="584" class="t">v_sales (agent view)</text>
+  <text x="922" y="604" class="s">read-only, from notebook 06</text>
+
+  <!-- pipeline arrows -->
+  <path class="flow" d="M426,330 L462,330"/>
+  <path class="flow" d="M646,300 L668,292"/>
+  <path class="flow" d="M646,330 L668,362"/>
+  <path class="flow" d="M646,360 L668,436"/>
+  <path class="flow" d="M882,290 L904,290"/>
+  <path class="flow" d="M882,512 C894,512 894,364 904,364"/>
+  <path class="flow" d="M882,300 C894,320 894,430 904,436"/>
+
+  <!-- pipeline footer -->
+  <text x="466" y="648" class="xs">Lessons from the first Databricks runs, now in the code:</text>
+  <text x="466" y="668" class="xs">• no count/first/collect inside table functions (tables don't exist yet when the graph is planned)</text>
+  <text x="466" y="686" class="xs">• TIMESTAMP_NTZ columns need delta.feature.timestampNtz on every table</text>
+  <text x="466" y="704" class="xs">• serverless can't cache → try_cache() · Spark ML models save through a UC volume</text>
+  <text x="466" y="740" class="num">Run time on Free Edition: pipeline 8.5 min · backtest 2.5 min · forecast 2 min</text>
+
+  <!-- ============ FORECASTING ============ -->
+  <rect x="1142" y="172" width="428" height="290" rx="14" fill="#f5f3ff" stroke="#a78bfa" stroke-width="2"/>
+  <text x="1160" y="196" class="h" fill="#6d28d9">FORECASTING · notebooks 04 + 05</text>
+
+  <rect x="1158" y="210" width="396" height="92" rx="10" class="card"/>
+  <text x="1172" y="234" class="t">04 · Backtest (last 12 weeks, one origin)</text>
+  <text x="1172" y="254" class="s">Spark ML gradient-boosted trees, one model for 1–12 weeks ahead</text>
+  <text x="1172" y="273" class="s">vs seasonal naive · 4-week average · last value → logged to MLflow</text>
+  <text x="1172" y="292" class="num">WAPE 0.646 (4-wk avg 0.677) · bias −3% vs −41%</text>
+
+  <rect x="1158" y="312" width="396" height="66" rx="10" class="card"/>
+  <text x="1172" y="336" class="t">05 · Final model on all history</text>
+  <text x="1172" y="356" class="s">registered in Unity Catalog: <tspan class="num">ml.demand_gbt@champion</tspan></text>
+  <text x="1172" y="372" class="xs">bands = p10/p90 of backtest errors (relative, so they scale)</text>
+
+  <rect x="1158" y="388" width="396" height="60" rx="10" class="card"/>
+  <rect x="1158" y="388" width="396" height="8" rx="4" fill="#f59e0b"/>
+  <text x="1172" y="416" class="t">gold.forecast_weekly</text>
+  <text x="1172" y="436" class="s">next 8 weeks per series, with p10 / p90 · <tspan class="num">1,816 rows</tspan></text>
+
+  <path class="flow" d="M1530,302 L1530,309"/>
+  <path class="flow" d="M1530,378 L1530,385"/>
+  <path class="flow" d="M1104,512 C1126,512 1130,256 1154,256"/>
+
+  <!-- ============ SERVING ============ -->
+  <rect x="1142" y="478" width="428" height="290" rx="14" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
+  <text x="1160" y="502" class="h" fill="#047857">SERVING</text>
+
+  <rect x="1158" y="514" width="396" height="168" rx="10" class="card"/>
+  <text x="1172" y="538" class="t">Data agent ("ask the lakehouse")</text>
+  <text x="1172" y="557" class="xs">FastAPI POST /ask → LangGraph</text>
+  <rect x="1172" y="566" width="110" height="28" rx="6" fill="#d1fae5"/>
+  <text x="1227" y="585" font-size="12" fill="#065f46" text-anchor="middle">LLM picks tool</text>
+  <rect x="1300" y="566" width="122" height="28" rx="6" fill="#d1fae5"/>
+  <text x="1361" y="585" font-size="12" fill="#065f46" text-anchor="middle">9 read-only tools</text>
+  <rect x="1440" y="566" width="100" height="28" rx="6" fill="#d1fae5"/>
+  <text x="1490" y="585" font-size="12" fill="#065f46" text-anchor="middle">grounding</text>
+  <line x1="1282" y1="580" x2="1296" y2="580" stroke="#065f46" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <line x1="1422" y1="580" x2="1436" y2="580" stroke="#065f46" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="1172" y="616" class="xs">Groq (gpt-oss-120b) → OpenRouter fallback on any error</text>
+  <text x="1172" y="634" class="xs">tools query gold via Databricks SQL warehouse (or DuckDB locally)</text>
+  <text x="1172" y="652" class="xs">every number must come from a tool result, or one retry</text>
+  <text x="1172" y="672" class="num">Eval: 30/30 questions (answers checked against SQL)</text>
+
+  <rect x="1158" y="692" width="396" height="60" rx="10" class="card"/>
+  <text x="1172" y="716" class="t">AI/BI dashboard</text>
+  <text x="1172" y="736" class="s">revenue trend · top products · returns · segments · forecast</text>
+
+  <path class="flow" d="M1104,586 C1126,586 1132,600 1154,600"/>
+  <path class="flow" d="M1356,448 L1356,511"/>
+  <path class="dash" d="M1104,300 C1130,300 1130,722 1154,722"/>
+
+  <!-- ============ ENGINEERING ============ -->
+  <rect x="30" y="796" width="1540" height="232" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="50" y="824" class="h" fill="#0f172a">ENGINEERING · one codebase, four places it runs</text>
+
+  <rect x="50" y="842" width="300" height="164" rx="10" fill="#f1f5f9"/>
+  <text x="66" y="868" class="t">GitHub repo</text>
+  <text x="66" y="888" class="s">khalednabawey/tillwise-lakehouse</text>
+  <text x="66" y="910" class="s">src/tillwise/ (pure PySpark functions)</text>
+  <text x="66" y="928" class="s">databricks/ notebooks + pipeline</text>
+  <text x="66" y="946" class="s">evals/ · tests/ · resources/ (bundle)</text>
+  <text x="66" y="974" class="xs">Databricks pulls it as a Git folder</text>
+
+  <rect x="380" y="842" width="300" height="164" rx="10" fill="#f1f5f9"/>
+  <text x="396" y="868" class="t">GitHub Actions CI</text>
+  <text x="396" y="888" class="s">every push: ruff + 31 unit tests</text>
+  <text x="396" y="910" class="s">PySpark on a local session (chispa)</text>
+  <text x="396" y="928" class="s">agent on a tiny DuckDB gold layer</text>
+  <text x="396" y="946" class="s">with a fake LLM (no keys needed)</text>
+  <text x="396" y="974" class="num">status: passing</text>
+
+  <rect x="710" y="842" width="400" height="164" rx="10" fill="#f1f5f9"/>
+  <text x="726" y="868" class="t">The same functions run in</text>
+  <text x="726" y="892" class="s">① unit tests (local Spark)</text>
+  <text x="726" y="912" class="s">② local runners: run_local · run_forecast_local · export_gold</text>
+  <text x="726" y="932" class="s">③ Databricks notebooks 00–07</text>
+  <text x="726" y="952" class="s">④ the Lakeflow pipeline</text>
+  <text x="726" y="978" class="xs">notebooks hold no business logic of their own</text>
+
+  <rect x="1140" y="842" width="410" height="164" rx="10" fill="#f1f5f9"/>
+  <text x="1156" y="868" class="t">Local development path</text>
+  <text x="1156" y="890" class="s">download_sources → data/raw/*.csv</text>
+  <text x="1156" y="910" class="s">export_gold_local → data/gold/*.parquet</text>
+  <text x="1156" y="930" class="s">uvicorn tillwise.agent.app:app → /docs</text>
+  <text x="1156" y="950" class="s">evals/run_eval.py → evals/reports/latest.md</text>
+  <text x="1156" y="978" class="xs">Python 3.12 · uv · PySpark 4 · Java 17+</text>
+
+  <line x1="350" y1="924" x2="376" y2="924" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="680" y1="924" x2="706" y2="924" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="1110" y1="924" x2="1136" y2="924" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- legend -->
+  <g font-size="11.5" fill="#475569">
+    <line x1="1080" y1="1046" x2="1110" y2="1046" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="1118" y="1050">data flow</text>
+    <line x1="1190" y1="1046" x2="1220" y2="1046" stroke="#64748b" stroke-width="1.6" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+    <text x="1228" y="1050">read by dashboard</text>
+    <rect x="1350" y="1039" width="14" height="14" rx="3" fill="#f59e0b"/>
+    <text x="1370" y="1050">gold table</text>
+    <rect x="1440" y="1039" width="14" height="14" rx="3" fill="#ef4444"/>
+    <text x="1460" y="1050">quarantine</text>
+  </g>
+</svg>
