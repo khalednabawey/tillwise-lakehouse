@@ -45,8 +45,13 @@ def log_backtest(result: BacktestResult, experiment: str, extra_params: dict | N
 
 
 def log_and_register(model: PipelineModel, sample: DataFrame, experiment: str,
-                     registered_model_name: str | None, alias: str = "champion") -> str | None:
-    """Log the final model; on Databricks register it in Unity Catalog and point `alias` at it."""
+                     registered_model_name: str | None, alias: str = "champion",
+                     dfs_tmpdir: str | None = None) -> str | None:
+    """Log the final model; on Databricks register it in Unity Catalog and point `alias` at it.
+
+    On serverless or shared compute, MLflow saves Spark ML models through a Unity Catalog volume,
+    so pass `dfs_tmpdir="/Volumes/<catalog>/<schema>/<volume>/..."` there.
+    """
     mlflow = _mlflow()
     if mlflow is None:
         return None
@@ -61,7 +66,7 @@ def log_and_register(model: PipelineModel, sample: DataFrame, experiment: str,
         inputs = pdf.drop(columns=[c for c in pdf.columns if c.startswith("pred") or c in ("label", "p10", "p90")])
         signature = infer_signature(inputs, pdf["prediction"]) if "prediction" in pdf else None
         info = mlflow.spark.log_model(model, artifact_path="model", signature=signature,
-                                      registered_model_name=registered_model_name)
+                                      registered_model_name=registered_model_name, dfs_tmpdir=dfs_tmpdir)
         if registered_model_name:
             from mlflow import MlflowClient
 

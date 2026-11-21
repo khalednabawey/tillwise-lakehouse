@@ -26,10 +26,6 @@ future = predict(model, future_frame(weekly, dim_date, horizons=8))
 quantiles = {int(r["h"]): (r["q10"], r["q90"]) for r in spark.table(T.fq("ml", "residual_quantiles")).collect()}
 forecast = with_intervals(future, quantiles)
 
-user = spark.sql("SELECT current_user()").first()[0]
-log_and_register(model, forecast, experiment=f"/Users/{user}/tillwise-demand-forecast",
-                 registered_model_name=T.fq("ml", "demand_gbt"))
-
 (forecast.select("stock_code", "country", "origin_week", "target_week", F.col("h").cast("int").alias("h"),
                  F.round("prediction", 1).alias("forecast_units"),
                  F.round("p10", 1).alias("p10"), F.round("p90", 1).alias("p90"))
@@ -37,3 +33,15 @@ log_and_register(model, forecast, experiment=f"/Users/{user}/tillwise-demand-for
  .write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(T.fq("gold", "forecast_weekly")))
 
 display(spark.table(T.fq("gold", "forecast_weekly")).orderBy("stock_code", "country", "h"))
+
+# COMMAND ----------
+
+# MAGIC %md Register the model in Unity Catalog (after the table is written, so a registry problem can't block the forecast).
+
+# COMMAND ----------
+
+spark.sql(f"CREATE VOLUME IF NOT EXISTS {CATALOG}.ml.mlflow_tmp")
+user = spark.sql("SELECT current_user()").first()[0]
+log_and_register(model, forecast, experiment=f"/Users/{user}/tillwise-demand-forecast",
+                 registered_model_name=T.fq("ml", "demand_gbt"),
+                 dfs_tmpdir=f"/Volumes/{CATALOG}/ml/mlflow_tmp/spark_models")
