@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets
+.env
+
+# Downloaded source data (see data/README.md); never committed
+data/raw/*
+!data/raw/.gitkeep
+data/build/
+
+# Spark local artefacts
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
