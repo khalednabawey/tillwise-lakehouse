@@ -11,6 +11,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 from tillwise.ml.dataset import FEATURES
+from tillwise.spark import try_cache
 
 DEFAULT_PARAMS = {"maxIter": 80, "maxDepth": 6, "stepSize": 0.1, "subsamplingRate": 0.8, "maxBins": 64,
                   "seed": 42}
@@ -77,7 +78,7 @@ def backtest(frame: DataFrame, test_weeks: int = 12, params: dict | None = None)
     test = frame.where((F.col("origin_idx") == cutoff) & (F.col("h") <= test_weeks))
 
     model = fit(train, params)
-    preds = add_baselines(predict(model, test)).cache()
+    preds = try_cache(add_baselines(predict(model, test)))
 
     metrics = {}
     for name, col in [("gbt", "prediction"), ("seasonal_naive", "pred_seasonal_naive"),

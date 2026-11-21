@@ -9,9 +9,11 @@
 # Data quality: every silver rule is a named expectation, so the pipeline UI shows a
 # pass/fail count per rule on each update. Rows that break a rule are kept in the
 # quarantine table instead of being dropped.
+#
+# No actions (count/collect/first) inside table functions: upstream tables don't exist yet when
+# the pipeline graph is planned, so every function here is a pure transformation.
 
 import sys
-from datetime import date
 
 import dlt
 from pyspark.sql import functions as F
@@ -100,11 +102,8 @@ def gold_dim_product():
 
 @dlt.table(name=fq("gold", "dim_date"), comment="Calendar with England bank holidays")
 def gold_dim_date():
-    hol = spark.read.option("header", True).csv(f"{LANDING}/reference/uk_holidays.csv").collect()
-    holidays = [(date.fromisoformat(r["date"]), r["holiday_name"]) for r in hol]
-    b = spark.read.table(fq("silver", "transactions")).agg(F.min("invoice_ts").alias("lo"),
-                                                           F.max("invoice_ts").alias("hi")).first()
-    return gold.build_dim_date(spark, date(b["lo"].year, 1, 1), date(b["hi"].year + 1, 12, 31), holidays)
+    holidays = spark.read.option("header", True).csv(f"{LANDING}/reference/uk_holidays.csv")
+    return gold.build_dim_date_for(spark.read.table(fq("silver", "transactions")), holidays)
 
 
 @dlt.table(name=fq("gold", "dim_country"))
@@ -126,9 +125,7 @@ def gold_fact_sales():
 
 @dlt.table(name=fq("gold", "customer_rfm"), comment="RFM scores and segments as of the last sale date")
 def gold_customer_rfm():
-    fact = spark.read.table(fq("gold", "fact_sales"))
-    as_of = fact.agg(F.max("invoice_ts")).first()[0].date()
-    return rfm.build_customer_rfm(fact, as_of)
+    return rfm.build_customer_rfm(spark.read.table(fq("gold", "fact_sales")))  # as of the last sale date
 
 
 @dlt.table(name=fq("gold", "weekly_product_demand"),

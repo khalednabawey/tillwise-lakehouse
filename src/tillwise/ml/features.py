@@ -29,18 +29,12 @@ def top_series(fact: DataFrame, n_products: int = 50, n_countries: int = 5) -> D
 
 
 def full_weeks(fact: DataFrame) -> DataFrame:
-    """Monday-starting weeks fully covered by the data."""
-    bounds = fact.agg(F.min("invoice_ts").alias("lo"), F.max("invoice_ts").alias("hi")).first()
-    lo, hi = bounds["lo"].date(), bounds["hi"].date()
-    spark = fact.sparkSession
-    return spark.sql(
-        f"""
-        SELECT explode(sequence(
-          date_trunc('week', date_add(DATE'{lo}', 6))::date,   -- first Monday on/after lo
-          date_add(date_trunc('week', date_add(DATE'{hi}', 1))::date, -7),  -- last week ending on/before hi
-          INTERVAL 7 DAY)) AS week_start
-        """
-    )
+    """Monday-starting weeks fully covered by the data. Lazy (no actions), so it works in Lakeflow."""
+    bounds = fact.agg(F.min("invoice_ts").cast("date").alias("lo"), F.max("invoice_ts").cast("date").alias("hi"))
+    return bounds.select(F.explode(F.expr(
+        "sequence(CAST(date_trunc('week', date_add(lo, 6)) AS DATE),"            # first Monday on/after lo
+        " date_add(CAST(date_trunc('week', date_add(hi, 1)) AS DATE), -7),"     # last week ending on/before hi
+        " INTERVAL 7 DAY)")).alias("week_start"))
 
 
 def weekly_demand(fact: DataFrame, dim_country: DataFrame, dim_date: DataFrame,

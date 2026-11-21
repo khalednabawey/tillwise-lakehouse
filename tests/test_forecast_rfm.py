@@ -130,3 +130,11 @@ def test_rfm_segments(spark):
     assert out["c9"]["segment"] == "Hibernating"
     assert out["c0"]["recency_days"] == 8
     assert {r["segment"] for r in out.values()} <= {name for name, _ in rfm.SEGMENT_RULES}
+
+
+def test_rfm_default_as_of_is_last_sale_date(spark):
+    rows = [("1", datetime(2011, 12, 1), "A", "UK", 1, 10.0, "c1", False),
+            ("2", datetime(2011, 12, 9, 12), "A", "UK", 1, 10.0, "c2", False)]
+    fact, _ = fact_rows(spark, rows)
+    out = {r["customer_id"]: r["recency_days"] for r in rfm.build_customer_rfm(fact).collect()}
+    assert out == {"c1": 8, "c2": 0}

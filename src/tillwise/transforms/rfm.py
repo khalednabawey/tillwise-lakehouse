@@ -18,14 +18,21 @@ SEGMENT_RULES: list[tuple[str, str]] = [
 ]
 
 
-def build_customer_rfm(fact: DataFrame, as_of: date) -> DataFrame:
-    """One row per known customer, scored 1-5 on each dimension with quintiles."""
+def build_customer_rfm(fact: DataFrame, as_of: date | None = None) -> DataFrame:
+    """One row per known customer, scored 1-5 on each dimension with quintiles.
+
+    `as_of` defaults to the last sale date in `fact`, computed lazily (safe inside Lakeflow pipelines).
+    """
     known = fact.where(F.col("customer_id").isNotNull())
+    as_of_df = (fact.agg(F.max("invoice_ts").cast("date").alias("as_of")) if as_of is None
+                else fact.sparkSession.createDataFrame([(as_of,)], "as_of date"))
     base = known.groupBy("customer_id").agg(
-        F.datediff(F.lit(as_of), F.max(F.when(~F.col("is_return"), F.col("invoice_ts")))).alias("recency_days"),
+        F.max(F.when(~F.col("is_return"), F.col("invoice_ts"))).alias("last_purchase_ts"),
         F.countDistinct(F.when(~F.col("is_return"), F.col("invoice_no"))).alias("frequency"),
         F.sum("line_revenue").cast("decimal(14,2)").alias("monetary"),
     ).where(F.col("frequency") > 0)  # customers with only returns have no purchase to score
+    base = base.crossJoin(as_of_df).withColumn(
+        "recency_days", F.datediff(F.col("as_of"), F.col("last_purchase_ts"))).drop("as_of", "last_purchase_ts")
 
     def quintile(col: str, ascending: bool) -> F.Column:
         # Order worst -> best and score ceil(cume_dist * 5). Unlike ntile, tied values always

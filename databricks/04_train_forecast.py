@@ -17,9 +17,10 @@ from pyspark.sql import functions as F
 from tillwise.ml.dataset import training_frame
 from tillwise.ml.model import backtest
 from tillwise.ml.tracking import log_backtest
+from tillwise.spark import try_cache
 
 weekly = spark.table(T.fq("gold", "weekly_product_demand"))
-frame = training_frame(weekly, horizons=12).cache()
+frame = try_cache(training_frame(weekly, horizons=12))
 result = backtest(frame, test_weeks=12)
 
 user = spark.sql("SELECT current_user()").first()[0]

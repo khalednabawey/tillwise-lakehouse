@@ -8,6 +8,14 @@ import sys
 from pyspark.sql import SparkSession
 
 
+def try_cache(df):
+    """Cache when the compute allows it. Databricks serverless doesn't support caching, so it's skipped there."""
+    try:
+        return df.cache()
+    except Exception:  # noqa: BLE001 - e.g. NOT_SUPPORTED_WITH_SERVERLESS
+        return df
+
+
 def local_spark(app_name: str = "tillwise-local", partitions: int = 4) -> SparkSession:
     # Make sure Spark workers use the same interpreter as the driver (uv venv on Windows).
     os.environ.setdefault("PYSPARK_PYTHON", sys.executable)

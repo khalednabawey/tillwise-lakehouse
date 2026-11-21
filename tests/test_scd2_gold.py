@@ -97,3 +97,12 @@ def test_dim_customer_primary_country_and_order_counts(spark):
         "last_purchase_ts timestamp_ntz, orders long, return_invoices long",
     )
     assert_df_equality(dim, expected, ignore_nullable=True)
+
+
+def test_lazy_dim_date_for_matches_eager_version(spark):
+    rows = [("1", "A", "x", 1, ts("2010-03-01 09:00:00"), "1", "UK", False, None),
+            ("2", "A", "x", 1, ts("2011-02-01 09:00:00"), "1", "UK", False, None)]
+    hol = spark.createDataFrame([("2010-12-25", "Christmas Day")], "date string, holiday_name string")
+    lazy = gold.build_dim_date_for(clean_df(spark, rows), hol)
+    eager = gold.build_dim_date(spark, date(2010, 1, 1), date(2012, 12, 31), [(date(2010, 12, 25), "Christmas Day")])
+    assert_df_equality(lazy, eager, ignore_row_order=True, ignore_nullable=True)

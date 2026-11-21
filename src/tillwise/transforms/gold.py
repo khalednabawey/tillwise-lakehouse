@@ -26,6 +26,24 @@ def build_dim_date(
         f"SELECT explode(sequence(DATE'{start.isoformat()}', DATE'{end.isoformat()}', INTERVAL 1 DAY)) AS d"
     )
     hol = spark.createDataFrame(list(holidays) or [(date(1900, 1, 1), "none")], "d date, holiday_name string")
+    return dim_date_from_days(days, hol)
+
+
+def build_dim_date_for(clean: DataFrame, holidays: DataFrame | None = None) -> DataFrame:
+    """Lazy version for Lakeflow pipelines (no actions): 1 Jan of the first sale year to 31 Dec of the
+    year after the last sale. `holidays` has columns date (string or date) and holiday_name."""
+    days = clean.agg(F.min("invoice_ts").alias("lo"), F.max("invoice_ts").alias("hi")).select(
+        F.explode(F.sequence(F.make_date(F.year("lo"), F.lit(1), F.lit(1)),
+                             F.make_date(F.year("hi") + 1, F.lit(12), F.lit(31)),
+                             F.expr("INTERVAL 1 DAY"))).alias("d"))
+    if holidays is None:
+        hol = clean.sparkSession.createDataFrame([(date(1900, 1, 1), "none")], "d date, holiday_name string")
+    else:
+        hol = holidays.select(F.col("date").cast("date").alias("d"), "holiday_name")
+    return dim_date_from_days(days, hol)
+
+
+def dim_date_from_days(days: DataFrame, hol: DataFrame) -> DataFrame:
     return (
         days.join(hol, "d", "left")
         .select(

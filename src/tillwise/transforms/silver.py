@@ -90,13 +90,29 @@ def split_transactions(typed: DataFrame) -> SilverResult:
 
 
 def dq_metrics(typed: DataFrame, result: SilverResult) -> DataFrame:
-    """One row per outcome, for the README table and the dq_metrics Delta table."""
+    """One row per outcome, for the README table and the dq_metrics Delta table.
+
+    Built only from transformations (no count()/collect()), so it also works inside a Lakeflow pipeline.
+    """
     spark = typed.sparkSession
-    total = typed.count()
-    rows = [("input_rows", total), ("duplicates_removed", result.duplicates_removed.count())]
-    reasons = {r["dq_reason"]: r["n"] for r in
-               result.quarantine.groupBy("dq_reason").agg(F.count("*").alias("n")).collect()}
-    rows += [(f"quarantine:{name}", int(reasons.get(name, 0))) for name in QUARANTINE_RULES]
-    rows += [("non_product_lines", result.non_product.count()), ("clean_rows", result.clean.count())]
-    df = spark.createDataFrame(rows, "metric string, row_count long")
-    return df.withColumn("pct_of_input", F.round(F.col("row_count") * 100.0 / F.lit(max(total, 1)), 2))
+
+    def single(df: DataFrame, name: str, order: int) -> DataFrame:
+        return df.agg(F.count("*").alias("row_count")).select(
+            F.lit(name).alias("metric"), "row_count", F.lit(order).alias("ord"))
+
+    rules = spark.createDataFrame([(f"quarantine:{n}", i + 2) for i, n in enumerate(QUARANTINE_RULES)],
+                                  "metric string, ord int")
+    found = result.quarantine.groupBy(F.concat(F.lit("quarantine:"), F.col("dq_reason")).alias("metric")).agg(
+        F.count("*").alias("row_count"))
+    quarantine = rules.join(found, "metric", "left").fillna(0, ["row_count"]).select("metric", "row_count", "ord")
+    outcomes = (single(typed, "input_rows", 0)
+                .unionByName(single(result.duplicates_removed, "duplicates_removed", 1))
+                .unionByName(quarantine)
+                .unionByName(single(result.non_product, "non_product_lines", 100))
+                .unionByName(single(result.clean, "clean_rows", 101)))
+    total = typed.agg(F.count("*").alias("total"))
+    return (outcomes.crossJoin(total)
+            .select("metric", F.col("row_count").cast("long").alias("row_count"),
+                    F.round(F.col("row_count") * 100.0 / F.greatest(F.col("total"), F.lit(1)), 2).alias("pct_of_input"),
+                    "ord")
+            .orderBy("ord").drop("ord"))
